@@ -11,13 +11,23 @@ local name='%{$fg[green]%}%n%{$reset_color%}@'
 local gitpinfo='$(my_git_prompt_info)%{$reset_color%}'
 local error='%(?..%{$fg[red]%}[%{$fg_bold[red]%}%?%{$reset_color%}%{$fg[red]%}]%{$reset_color%})'
 
+# Truncate path
+function truncate_dir() {
+	local long_path=$(pwd | perl -pe 's:^\Q$ENV{HOME}:~:')
+	local short_path=$(echo $long_path | perl -pe 's:(\w)[^/]+/:\1/:g')
+	if [[ "${#long_path}" -gt 8 ]]; then
+		echo "$short_path"
+	else
+		echo "$long_path"
+	fi
+}
 
 # Test to see if user is root
 if [[ $EUID == 0 ]]; then
-	local dir='%{$fg[red]%}%2~%{$reset_color%} '
+	local dir="%{$fg[red]%}$(truncate_dir)%{$reset_color%} "
 	local arrow='# '
 else
-	local dir='%{$fg[green]%}%2~%{$reset_color%} '
+	local dir="%{$fg[green]%}$(truncate_dir)%{$reset_color%} "
 	local arrow='%B»%b '
 fi
 
